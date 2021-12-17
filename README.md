@@ -11,7 +11,7 @@ Arduino code using :
 First, insert your Soracom SIM card in the dedicated slot under the board
 
 Then assemble your board & sensors as in the picture below: 
-![setup](./HW setup.jpg)
+![setup](./HW-setup.jpg)
 
 * Plug the Grove GPS Sensor on the SERIAL plug
 * Plug the Grove Temperature Sensor on the D4 plug
