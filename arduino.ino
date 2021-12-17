@@ -55,7 +55,7 @@ void loop()
     if (GPS.encode(Serial1.read()))
     {
       GPSTries++;
-      if (GPS.location.isValid()  || GPSTries > 12){
+      if (GPS.location.isValid()  || GPSTries > 25){
         GPSTries=0;
         getTemperature();
         if (GPS.location.isValid()){
