@@ -41,8 +41,8 @@ void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
   dht.begin();
-  delay(3000);
   modem.begin();
+  delay(1000);
   Serial.print("Your ICCID is \t");
   Serial.println(modem.getICCID());
   cellLocation.begin();
