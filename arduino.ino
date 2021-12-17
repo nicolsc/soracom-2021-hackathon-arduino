@@ -31,6 +31,10 @@ GSM gsmAccess;
 GPRS gprsAccess;
 GSMClient client;
 GSMModem modem;
+GSMLocation cellLocation;
+
+
+int GPSTries;
 
 void setup() {
 
@@ -41,15 +45,31 @@ void setup() {
   modem.begin();
   Serial.print("Your ICCID is \t");
   Serial.println(modem.getICCID());
+  cellLocation.begin();
+  GPSTries=0;
 }
 void loop()
 {
+  
   while (Serial1.available() > 0) {
     if (GPS.encode(Serial1.read()))
     {
-      if (GPS.location.isValid()) {
+      GPSTries++;
+      if (GPS.location.isValid()  || GPSTries > 12){
+        GPSTries=0;
         getTemperature();
-        displayLocation();
+        if (GPS.location.isValid()){
+          displayLocation();
+        }
+        else{
+          Serial.println("Failed to get GPS fix ; fallback to cell location: \t");
+          while(!cellLocation.available()){ 
+            Serial.println("... waiting for cell location ...");
+          }
+          Serial.print(cellLocation.latitude(), 6);
+          Serial.print("\t");
+          Serial.println(cellLocation.longitude(), 6);
+        }
         displayTemperature();
         if (connection()) {
           sendData();
@@ -110,8 +130,7 @@ void displayTemperature() {
   Serial.println(temperature);
 }
 String getStructuredData() {
-
-  String json = "{\"deviceid\":\"" + modem.getICCID() + "\", \"temperature\":" + (isnan(temperature) ? "null" : String(temperature)) + ", \"humidity\":" + (isnan(humidity) ? "null" : String(humidity)) + ", \"latitude\":" + String(GPS.location.lat(), 6) + ", \"longitude\":" + String(GPS.location.lng(), 6) + "}";
+  String json = "{\"deviceid\":\"" + modem.getICCID() + "\", \"temperature\":" + (isnan(temperature) ? "null" : String(temperature)) + ", \"humidity\":" + (isnan(humidity) ? "null" : String(humidity)) + ", \"latitude\":" + String(GPS.location.isValid() ? GPS.location.lat() : cellLocation.latitude(), 6) + ", \"longitude\":" + String(GPS.location.isValid() ? GPS.location.lng() : cellLocation.longitude(), 6) + "}";
   Serial.println(json);
   return json;
 }
